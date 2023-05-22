@@ -5,13 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-enum Param {
-    MIN_BRANCHES, MAX_BRANCHES,
-    MIN_BRANCH_LENGTH, MAX_BRANCH_LENGTH,
-    MAX_DEPTH,
-    DIM,
-    BRANCH_WEIGHTS, BRANCH_GROWTH
-}
 
 public class Trees extends PApplet{
     ParamHandler params;
@@ -23,7 +16,7 @@ public class Trees extends PApplet{
     LinkedList<Branch> current;
     HashMap<Integer, Integer> newBranches;
 
-    public Trees(String[] rawParams){
+    public Trees(HashMap<String, String> rawParams){
         this.params = new ParamHandler(rawParams);
         this.init = true;
         this.weights = this.params.branchWeights;
@@ -97,7 +90,7 @@ public class Trees extends PApplet{
 //                if (isOutOfBounds(currentEndX, currentEndY)) {
 //                    j--;
 //                    continue;
-//                }
+//                }TODO
                 Branch newBranch = new Branch(this.g, currentRootX, currentRootY, currentEndX, currentEndY, newBranchAngle);
                 current.add(newBranch);
 
@@ -107,19 +100,9 @@ public class Trees extends PApplet{
         }
     }
 
-    private boolean isOutOfBounds(double x, double y) { // INTRODUCE PADDING PARAM INSTEAD OF MAGIC NUMS
-        if (x < 50 || x > 250)
-            return true;
-        return y < 50  || y > 250;
-    }
-
-    private Param getParamFromValue(int index){
-        return Param.values()[index];
-    }
-
-    public static void main(String[]args){
-        String[] processingArgs = {"MySketch"};
-        Trees trees = new Trees(args);
-        PApplet.runSketch(processingArgs, trees);
-    }
+//    private boolean isOutOfBounds(double x, double y) { // INTRODUCE PADDING PARAM INSTEAD OF MAGIC NUMS
+//        if (x < 50 || x > 250)
+//            return true;
+//        return y < 50  || y > 250;
+//    }
 }
