@@ -83,8 +83,8 @@ public class Trees extends PApplet{
                         (float)params.minBranchLength,
                         (float)params.maxBranchLength * 2 / depth));
                 double newBranchAngle = random(
-                        -PI,
-                        0);
+                        (float) params.minAngle,
+                        (float) params.maxAngle);
                 double currentEndX = currentRootX + (newBranchLength * cos((float)newBranchAngle));
                 double currentEndY = currentRootY + (newBranchLength * sin((float)newBranchAngle));
 //                if (isOutOfBounds(currentEndX, currentEndY)) {

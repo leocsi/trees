@@ -10,8 +10,8 @@ public class ParamHandler {
             "mxb",
             "ml",
             "mxl",
-//                "ma",
-//                "mxa",
+            "ma",
+            "mxa",
             "mxd",
             "dim"
     };
@@ -20,6 +20,8 @@ public class ParamHandler {
     double maxBranches;
     double minBranchLength;
     double maxBranchLength;
+    double minAngle;
+    double maxAngle;
     int maxDepth;
     int dim;
     double[] branchWeights;
@@ -39,10 +41,13 @@ public class ParamHandler {
         this.maxBranches = Double.parseDouble(paramsRaw.get("mxb"));
         this.minBranchLength = Double.parseDouble(paramsRaw.get("ml"));
         this.maxBranchLength = Double.parseDouble(paramsRaw.get("mxl"));
+        this.minAngle = Double.parseDouble(paramsRaw.get("ma"));
+        this.maxAngle = Double.parseDouble(paramsRaw.get("mxa"));
         this.maxDepth = Integer.parseInt(paramsRaw.get("mxd"));
         this.dim = Integer.parseInt(paramsRaw.get("dim"));
         this.branchWeights = parsedoubleArray(paramsRaw.get("bw"));
         this.branchGrowth = parsedoubleArray(paramsRaw.get("bg"));
+
 
         this.constructNewGrowthFunctions();
     }

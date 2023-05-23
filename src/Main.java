@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         String[] processingArgs = {"MySketch"};
 
-        Pattern pattern = Pattern.compile("(-((mb|mxb|ml|mxl|ma|mxa|mxd|dim)\\s([0-9]+\\.)?[0-9]+|(bw|bg)\\s((([0-9]+\\.)?[0-9]+),?)+|(c\\s[^\\s]*))\\s?)*");
+        Pattern pattern = Pattern.compile("(-((mb|mxb|ml|mxl|ma|mxa|mxd|dim)\\s-?([0-9]+\\.)?-?[0-9]+|(bw|bg)\\s((([0-9]+\\.)?[0-9]+),?)+|(c\\s[^\\s]*))\\s?)*");
         Matcher matcher = pattern.matcher(String.join(" ", args));
         if (matcher.matches()){
             Trees trees;

@@ -21,13 +21,13 @@ public class Util {
             while (fileReader.hasNextLine()){
                 linenr ++;
                 String[] currentLine = fileReader.nextLine().split("\\s");
-                String[] elements;
+                String[] elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
+
                 int expectedLength;
                 try {
                     switch (currentLine[0]){
                         case "branch-number-bounds":
                             expectedLength = 2;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
@@ -39,7 +39,6 @@ public class Util {
 
                         case "max-depth":
                             expectedLength = 1;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
@@ -50,7 +49,6 @@ public class Util {
 
                         case "branch-length-bounds":
                             expectedLength = 2;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
@@ -62,7 +60,6 @@ public class Util {
 
                         case "dim":
                             expectedLength = 1;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
@@ -73,7 +70,6 @@ public class Util {
 
                         case "branch-weights":
                             expectedLength = 1;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
@@ -84,12 +80,21 @@ public class Util {
 
                         case "branch-growth":
                             expectedLength = 1;
-                            elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
                             if (elements.length != expectedLength){
                                 throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
                             }
                             else{
                                 arguments.put("bg", elements[0]);
+                            }
+                            continue;
+                        case "angle-bounds":
+                            expectedLength = 2;
+                            if (elements.length != expectedLength){
+                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
+                            }
+                            else{
+                                arguments.put("ma", elements[0]);
+                                arguments.put("mxa", elements[1]);
                             }
                             continue;
                         default:
