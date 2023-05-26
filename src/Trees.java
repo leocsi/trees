@@ -19,9 +19,9 @@ public class Trees extends PApplet{
     public Trees(HashMap<String, String> rawParams){
         this.params = new ParamHandler(rawParams);
         this.init = true;
+        this.depth = 1;
         this.weights = this.params.branchWeights;
         this.weightsSum = Arrays.stream(this.weights).sum();
-        this.depth = 1;
         this.all = new LinkedList<>();
         newBranches = new HashMap<>();
 
@@ -37,20 +37,17 @@ public class Trees extends PApplet{
                     List.of(new Branch(this.g,params.dim/2f, params.dim-51, params.dim/2f, params.dim-51, 0f)));
             init = false;
         }
-        if (current.size() > 0 && depth < params.maxDepth) {
-            branch();
-            depth++;
+        if (current.size() > 0) {
             weightsSum = 0f;
             for (int i = 0; i<params.branchWeights.length; i++) {
                 double updatedValue = params.growths.get(i).applyAsDouble(depth);
                 this.weights[i] = updatedValue;
                 weightsSum += updatedValue;
             }
+            branch();
+            depth++;
         }
         else{
-            for(Integer integer : newBranches.keySet()){
-                System.out.println(newBranches.get(integer));
-            }
             save("tree.jpg");
             exit();
         }

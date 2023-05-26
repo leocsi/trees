@@ -23,79 +23,31 @@ public class Util {
                 String[] currentLine = fileReader.nextLine().split("\\s");
                 String[] elements = Arrays.copyOfRange(currentLine,1, currentLine.length);
 
-                int expectedLength;
                 try {
                     switch (currentLine[0]){
                         case "branch-number-bounds":
-                            expectedLength = 2;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("mb", elements[0]);
-                                arguments.put("mxb", elements[1]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"mb", "mxb"}, elements);
                             continue;
-
                         case "max-depth":
-                            expectedLength = 1;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("mxd", elements[0]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"mxd"}, elements);
                             continue;
-
                         case "branch-length-bounds":
-                            expectedLength = 2;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("ml", elements[0]);
-                                arguments.put("mxl", elements[1]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"ml", "mxl"}, elements);
                             continue;
-
                         case "dim":
-                            expectedLength = 1;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("dim", elements[0]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"dim"}, elements);
                             continue;
-
                         case "branch-weights":
-                            expectedLength = 1;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("bw", elements[0]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"bw"}, elements);
                             continue;
-
                         case "branch-growth":
-                            expectedLength = 1;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("bg", elements[0]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"bg"}, elements);
                             continue;
                         case "angle-bounds":
-                            expectedLength = 2;
-                            if (elements.length != expectedLength){
-                                throw new InvalidNumberOfArgumentsException(elements.length, expectedLength);
-                            }
-                            else{
-                                arguments.put("ma", elements[0]);
-                                arguments.put("mxa", elements[1]);
-                            }
+                            updateArgumentsMap(arguments, new String[]{"ma", "mxa"}, elements);
+                            continue;
+                        case "trunk-size":
+                             updateArgumentsMap(arguments, new String[]{"ts"}, elements);
                             continue;
                         default:
                             throw new InvalidConfigFileException(Integer.toString(linenr), "\""+currentLine[0]+"\". Parameter not recognised.");
@@ -116,4 +68,20 @@ public class Util {
         return arguments;
     }
 
+    static <T> T[] concatArrays(T[] a1, T[] a2){
+        T[] result = Arrays.copyOf(a1, a1.length + a2.length);
+        System.arraycopy(a2, 0, result, a1.length, a2.length);
+        return result;
+    }
+
+    static void updateArgumentsMap(HashMap<String, String> map, String[] expectedArguments, String[] givenArguments) throws InvalidNumberOfArgumentsException{
+        if (expectedArguments.length != givenArguments.length){
+            throw new InvalidNumberOfArgumentsException(givenArguments.length, expectedArguments.length);
+        }
+        else{
+            for (int i = 0; i<expectedArguments.length; i++){
+                map.put(expectedArguments[i], givenArguments[i]);
+            }
+        }
+    }
 }

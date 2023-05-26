@@ -5,7 +5,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.ArrayList;
 
 public class ParamHandler {
-    static String[] argumentList = {
+    static String[] floatArgumentList = {
             "mb",
             "mxb",
             "ml",
@@ -16,6 +16,14 @@ public class ParamHandler {
             "dim"
     };
 
+    static String[] arrayArgumentList = {
+            "bw",
+            "bg"
+    };
+
+    static String[] argumentList = Util.concatArrays(floatArgumentList, arrayArgumentList);
+
+    int trunkSize;
     double minBranches;
     double maxBranches;
     double minBranchLength;
@@ -47,6 +55,7 @@ public class ParamHandler {
         this.dim = Integer.parseInt(paramsRaw.get("dim"));
         this.branchWeights = parsedoubleArray(paramsRaw.get("bw"));
         this.branchGrowth = parsedoubleArray(paramsRaw.get("bg"));
+        this.trunkSize = Integer.parseInt(paramsRaw.get("ts"));
 
 
         this.constructNewGrowthFunctions();
@@ -67,20 +76,39 @@ public class ParamHandler {
         for (int i = 0; i < this.branchWeights.length; i++) {
             double weight = this.branchWeights[i];
             double growth = this.branchGrowth[i];
-            if (i == 0 && this.maxDepth > 0) {
-                growths.add(i, growthWithLimit(weight, growth, this.maxDepth));
-            } else {
-                growths.add(i, growth(weight, growth));
+
+            if (i == 0){
+                growths.add(i, this.trunkSize>0? lowerBoundedGrowth(weight, growth, this.trunkSize):
+                        growth(weight, growth));
             }
-            this.growths = growths;
+            else if(i == 1){
+                growths.add(i, this.maxDepth >0? upperBoundedGrowth(weight, growth, this.maxDepth):
+                        growth(weight, growth));
+            }
+            else{
+                growths.add(i,
+                        this.trunkSize> 0? this.maxDepth> 0? boundedGrowth(weight, growth, this.trunkSize, this.maxDepth):
+                                lowerBoundedGrowth(weight, growth, this.trunkSize):
+                                this.maxDepth>0? upperBoundedGrowth(weight, growth, this.maxDepth): growth(weight, growth)
+                );
+            }
         }
+        this.growths = growths;
     }
 
-    public ToDoubleFunction<Integer> growthWithLimit(double weight, double growth, int limit) {
-        return (Integer depth) -> weight * Math.pow(growth, depth) + Math.floor((float) (depth / limit)) * Math.pow(depth, 1.4f);
+    public ToDoubleFunction<Integer> upperBoundedGrowth(double weight, double growth, int upperBound) {
+        return (Integer depth) -> weight * Math.pow(growth, depth) * Math.floor((float) upperBound/depth);
     }
 
     public ToDoubleFunction<Integer> growth(double weight, double growth) {
         return (Integer depth) -> weight * Math.pow(growth, depth);
+    }
+
+    public ToDoubleFunction<Integer> lowerBoundedGrowth(double weight, double growth, int lowerBound){
+        return (Integer depth) -> Math.floor((float) (depth / lowerBound)) * weight * Math.pow(growth, depth);
+    }
+
+    public ToDoubleFunction<Integer> boundedGrowth(double weight, double growth, int lowerBound, int upperBound){
+        return (Integer depth) -> Math.floor((float) (depth / lowerBound)) * (weight * Math.pow(growth, depth)) * Math.floor((float) (upperBound / depth));
     }
 }
