@@ -8,7 +8,10 @@ public class Main {
     public static void main(String[] args) {
         String[] processingArgs = {"MySketch"};
 
-        Pattern pattern = Pattern.compile("(-((mb|mxb|ml|mxl|ma|mxa|mxd|dim)\\s-?([0-9]+\\.)?-?[0-9]+|(bw|bg)\\s((([0-9]+\\.)?[0-9]+),?)+|(c\\s[^\\s]*))\\s?)*");
+        String floatArguments = String.join("|", ParamHandler.floatArgumentList);
+        String arrayArguments = String.join("|", ParamHandler.arrayArgumentList);
+        Pattern pattern = Pattern.compile("(-(("+floatArguments+")\\s-?([0-9]+\\.)?-?[0-9]+|("+arrayArguments+")\\s((([0-9]+\\.)?[0-9]+),?)+|(c\\s[^\\s]*))\\s?)*");
+
         Matcher matcher = pattern.matcher(String.join(" ", args));
         if (matcher.matches()){
             Trees trees;
@@ -17,8 +20,7 @@ public class Main {
                 commandLineArgs.put(args[i].substring(1), args[i+1]); //put cl input values in hashmap
             }
             if (commandLineArgs.keySet().size() == 0){ //sample run with default params
-                HashMap<String, String> configArguments = Util.readFromConfigFile("default.conf");
-                trees = new Trees(configArguments);
+                trees = new Trees(new HashMap<String, String>());
             }
             else if (commandLineArgs.containsKey("c")){ //config file specified
                 String path = commandLineArgs.get("c");
@@ -41,5 +43,4 @@ public class Main {
             System.exit(-1);
         }
     }
-
 }
