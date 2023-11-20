@@ -1,5 +1,7 @@
 import Exceptions.InvalidConfigFileException;
 import Exceptions.InvalidNumberOfArgumentsException;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,5 +85,17 @@ public class Util {
                 map.put(expectedArguments[i], givenArguments[i]);
             }
         }
+    }
+
+    static int weightedProbabilityExperiment(double[] weights){
+        double weightsSum = Arrays.stream(weights).sum();
+        double weight = ThreadLocalRandom.current().nextDouble(0, weightsSum);
+        for (int i = 0;i<weights.length; i++){
+            weight = weight - weights[i];
+            if (weight< 0){
+                return i;
+            }
+        }
+        return -1;
     }
 }

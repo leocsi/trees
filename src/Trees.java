@@ -1,6 +1,5 @@
 import processing.core.PApplet;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 
 public class Trees extends PApplet{
     ParamHandler params;
-    double weightsSum;
     int depth;
     boolean init;
     double[] weights;
@@ -21,10 +19,8 @@ public class Trees extends PApplet{
         this.init = true;
         this.depth = 1;
         this.weights = this.params.branchWeights;
-        this.weightsSum = Arrays.stream(this.weights).sum();
         this.all = new LinkedList<>();
         newBranches = new HashMap<>();
-
     }
 
     public void settings(){
@@ -38,11 +34,9 @@ public class Trees extends PApplet{
             init = false;
         }
         if (current.size() > 0) {
-            weightsSum = 0f;
             for (int i = 0; i<params.branchWeights.length; i++) {
                 double updatedValue = params.growths.get(i).applyAsDouble(depth);
                 this.weights[i] = updatedValue;
-                weightsSum += updatedValue;
             }
             branch();
             depth++;
@@ -57,16 +51,7 @@ public class Trees extends PApplet{
         LinkedList<Branch> currentBranchesTemp = (LinkedList<Branch>) current.clone();
         current.clear();
         for (Branch currentBranch : currentBranchesTemp) {
-            double weight = random(0, (float) weightsSum);
-
-            int newBranches = 0;
-            for (int j = 0; j < params.branchWeights.length; j++) {
-                weight = weight - params.branchWeights[j];
-                if (weight < 0) {
-                    newBranches = j;
-                    break;
-                }
-            }
+            int newBranches = Util.weightedProbabilityExperiment(this.weights);
             this.newBranches.put(newBranches, this.newBranches.getOrDefault(newBranches, 0) + 1);
             if (newBranches == 0) { //Dead end branch
                 all.add(currentBranch);
@@ -79,6 +64,8 @@ public class Trees extends PApplet{
                 int newBranchLength = Math.round(random(
                         (float)params.minBranchLength,
                         (float)params.maxBranchLength * 2 / depth));
+
+
                 double newBranchAngle = random(
                         (float) params.minAngle,
                         (float) params.maxAngle);
@@ -88,6 +75,7 @@ public class Trees extends PApplet{
 //                    j--;
 //                    continue;
 //                }TODO
+
                 Branch newBranch = new Branch(this.g, currentRootX, currentRootY, currentEndX, currentEndY, newBranchAngle);
                 current.add(newBranch);
 
