@@ -53,11 +53,14 @@ public class Util {
                             throw new InvalidConfigFileException(Integer.toString(linenr), "\""+currentLine[0]+"\". Parameter not recognised.");
                     }
                 } catch (InvalidNumberOfArgumentsException e) {
+                    fileReader.close();
                     throw new InvalidConfigFileException(Integer.toString(linenr), currentLine[0]+". "+e.getMessage());
                 } catch (NumberFormatException e) {
+                    fileReader.close();
                     throw new InvalidConfigFileException(Integer.toString(linenr), currentLine[0] + ". Expected numbers as arguments.");
                 }
             }
+            fileReader.close();
         }catch(FileNotFoundException e){
             System.out.println("Config file could not be found.");
             System.exit(-1);
