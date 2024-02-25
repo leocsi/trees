@@ -12,9 +12,8 @@ public class Trees extends PApplet{
     int depth;
     boolean init;
     double[] weights;
-    LinkedList<Branch> all;
-    LinkedList<Branch> current;
-    HashMap<Integer, Integer> newBranches;
+    Branch root;
+    LinkedList<Branch> newEdges;
 
     public Trees(HashMap<String, String> rawParams){
         this.params = new ParamHandler(rawParams);
@@ -22,9 +21,6 @@ public class Trees extends PApplet{
         this.depth = 1;
         this.weights = this.params.branchWeights;
         this.weightsSum = Arrays.stream(this.weights).sum();
-        this.all = new LinkedList<>();
-        newBranches = new HashMap<>();
-
     }
 
     public void settings(){
@@ -33,18 +29,25 @@ public class Trees extends PApplet{
 
     public void draw(){
         if (init) {
-            current = new LinkedList<>(
-                    List.of(new Branch(this.g,params.dim/2f, params.dim-51, params.dim/2f, params.dim-51, 0f)));
+            this.root = new Branch(null, this.g, params.dim/2f, params.dim-51, params.dim/2f, params.dim-51, 0f);
+            newEdges = new LinkedList<>(
+                    List.of(this.root));
             init = false;
         }
-        if (current.size() > 0) {
+
+        if (newEdges.size() > 0) {
+            //Recalculate weights for next level of depth
             weightsSum = 0f;
             for (int i = 0; i<params.branchWeights.length; i++) {
                 double updatedValue = params.growths.get(i).applyAsDouble(depth);
                 this.weights[i] = updatedValue;
                 weightsSum += updatedValue;
             }
-            branch();
+
+            sproutBranches();
+            killBranches();
+            growBranches();
+    
             depth++;
         }
         else{
@@ -53,28 +56,19 @@ public class Trees extends PApplet{
         }
     }
 
-    private void branch() {
-        LinkedList<Branch> currentBranchesTemp = (LinkedList<Branch>) current.clone();
-        current.clear();
-        for (Branch currentBranch : currentBranchesTemp) {
-            double weight = random(0, (float) weightsSum);
-
-            int newBranches = 0;
-            for (int j = 0; j < params.branchWeights.length; j++) {
-                weight = weight - params.branchWeights[j];
-                if (weight < 0) {
-                    newBranches = j;
-                    break;
-                }
-            }
-            this.newBranches.put(newBranches, this.newBranches.getOrDefault(newBranches, 0) + 1);
+    private void sproutBranches() {
+        LinkedList<Branch> previousEdges = (LinkedList<Branch>) newEdges.clone();
+        newEdges.clear();
+        for (Branch previousEdge : previousEdges) {
+            int newBranches = getSproutNumber(random(0, (float) weightsSum));            
+            
             if (newBranches == 0) { //Dead end branch
-                all.add(currentBranch);
                 continue;
             }
-
-            double currentRootX = currentBranch.end[0];
-            double currentRootY = currentBranch.end[1];
+            
+            //Calculate new branches with random length and angle
+            double currentRootX = previousEdge.end[0];
+            double currentRootY = previousEdge.end[1];
             for (int j = 0; j < newBranches; j++) {
                 int newBranchLength = Math.round(random(
                         (float)params.minBranchLength,
@@ -84,22 +78,34 @@ public class Trees extends PApplet{
                         (float) params.maxAngle);
                 double currentEndX = currentRootX + (newBranchLength * cos((float)newBranchAngle));
                 double currentEndY = currentRootY + (newBranchLength * sin((float)newBranchAngle));
-//                if (isOutOfBounds(currentEndX, currentEndY)) {
-//                    j--;
-//                    continue;
-//                }TODO
-                Branch newBranch = new Branch(this.g, currentRootX, currentRootY, currentEndX, currentEndY, newBranchAngle);
-                current.add(newBranch);
 
-                all.add(currentBranch);
+                Branch newBranch = new Branch(previousEdge, this.g, currentRootX, currentRootY, currentEndX, currentEndY, newBranchAngle);
+
+                //Add new branch to edge branches
+                newEdges.add(newBranch);
 
             }
         }
+        //Draw!
+        for (Branch branch : newEdges){
+            this.g.line((float)branch.start[0], (float)branch.start[1], (float)branch.end[0], (float)branch.end[1]);
+        }
     }
 
-//    private boolean isOutOfBounds(double x, double y) { // INTRODUCE PADDING PARAM INSTEAD OF MAGIC NUMS
-//        if (x < 50 || x > 250)
-//            return true;
-//        return y < 50  || y > 250;
-//    }
+    private int getSproutNumber(float weight){
+        for (int j = 0; j < params.branchWeights.length; j++) {
+            if (weight - params.branchWeights[j] < 0) {
+                return j;
+            }
+        }
+        return -1; // Should never happen?
+    }
+
+    private void killBranches(){
+        //Todo pick pick a few randomly recursive paths to delete
+    }
+
+    private void growBranches(){
+        //Todo thicken branches with every evolution
+    }
 }
